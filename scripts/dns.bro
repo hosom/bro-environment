@@ -20,6 +20,7 @@ export {
 event dns_message(c: connection, is_orig: bool, msg: dns_msg, len: count)
     {
     if ( c$id$resp_h !in seen_dns_servers 
+        && c$id$resp_p != 137/udp
         && addr_matches_host(c$id$resp_h, host_tracking) )
         {
         local documented = F;
