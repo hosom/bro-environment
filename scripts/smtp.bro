@@ -16,7 +16,7 @@ export {
 
 event connection_state_remove(c: connection)
     {
-    if ( "SMTP" in c$service && c$id$resp_h !in seen_smtp_servers)
+    if ( "SMTP" in c$service && c$id$resp_h !in seen_smtp_servers && addr_matches_host(c$id$resp_h, host_tracking) )
         {
         local documented = F;
         if ( c$id$resp_h in SMTP_SERVERS )
