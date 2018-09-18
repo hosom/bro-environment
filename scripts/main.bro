@@ -54,6 +54,9 @@ export {
     ## The timeout for how long Broker operations should take.
     option environment_store_timeout = 15sec;
 
+    ## Persist environment state through a restart
+    option persist = F;
+
     ## add_to_environment allows accompanying scripts to add a host to 
     ## the environment tracking store.
     global add_to_environment: function(h: HostsInfo);
@@ -72,7 +75,7 @@ event bro_init()
     {
     # initialize the Broker store
     Environment::environment_store = Cluster::create_store(
-        Environment::environment_store_name, T);
+        Environment::environment_store_name, persist);
     }
 
 event bro_init()
