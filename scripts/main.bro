@@ -82,7 +82,7 @@ event bro_init()
         [$columns=HostsInfo, $ev=log_environment, $path="environment"]);
     }
 
-event discovery(h: HostsInfo) &priority=-10
+event Environment::discovery(h: HostsInfo) &priority=-10
     {
     # write the environment record to environment log
     Log::write(Environment::ENVIRONMENT_LOG, h);
