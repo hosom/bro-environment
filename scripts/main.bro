@@ -7,7 +7,7 @@ module Environment;
 @load base/frameworks/cluster
 
 ## Define configuration file for options for the Environment module
-redef Config::config_files += { "/opt/bro/share/bro/site/bro-environment/scripts/environment.dat" };
+redef Config::config_files += { fmt("%/environment.dat", @DIR) };
 
 export {
     ## The environment logging stream identifier.
