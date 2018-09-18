@@ -19,7 +19,8 @@ export {
 
 event connection_state_remove(c: connection)
     {
-    if ( "DNS" in c$service && c$id$resp_h !in seen_dns_servers && addr_matches_host(c$id$resp_h, host_tracking) )
+    if ( "DNS" in c$service && c$id$resp_h !in seen_dns_servers 
+            && addr_matches_host(c$id$resp_h, host_tracking) && c$id$resp_p != 137/udp )
         {
         local documented = F;
         if ( c$id$resp_h in DNS_SERVERS )
