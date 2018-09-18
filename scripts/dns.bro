@@ -17,13 +17,13 @@ export {
     global seen_dns_servers: set[addr] &create_expire=60min;
 }
 
-event connection_state_remove(c: connection)
+event dns_message(c: connection, is_orig: bool, msg: dns_msg, len: count)
     {
-    if ( "DNS" in c$service && c$id$resp_h !in seen_dns_servers 
-            && c$history == "SF"
-            && addr_matches_host(c$id$resp_h, host_tracking) && c$id$resp_p != 137/udp )
+    if ( c$id$resp_h !in seen_dns_servers 
+        && addr_matches_host(c$id$resp_h, host_tracking) )
         {
         local documented = F;
+        
         if ( c$id$resp_h in DNS_SERVERS )
             documented = T;
 
