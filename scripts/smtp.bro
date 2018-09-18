@@ -18,7 +18,7 @@ event connection_state_remove(c: connection)
         if ( c$id$resp_h in SMTP_SERVERS )
             documented = T;
         
-        Environment::add_to_environment(HostsInfo($ts = c$ts,
+        Environment::add_to_environment(HostsInfo($ts = c$start_time,
                                                     $uid = c$uid,
                                                     $host = c$id$resp_h,
                                                     $host_type = SMTP_SERVER,
