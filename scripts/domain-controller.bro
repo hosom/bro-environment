@@ -16,6 +16,9 @@ export {
     global seen_domain_controllers: set[addr] &create_expire=60min;
 }
 
+# drsuapi is the rpc endpoint used for domain replication. In any environment
+# with >1 domain controllers, this endpoint will be heavily used. With this 
+# method, we can detect DCs that aren't client facing.
 event dce_rpc_response(c: connection, fid: count, ctx_id: count, 
     opnum: count, stub_len: count)
     {
@@ -41,6 +44,9 @@ event dce_rpc_response(c: connection, fid: count, ctx_id: count,
         }
     }
 
+# sysvol shares public files from a domain controller. This should be a solid
+# way to detect client facing domain controllers. This is also reliable for 
+# detecting domain controllers in domains with only a single domain controller
 event smb2_tree_connect_response(c: connection, hdr: SMB2::Header, response: SMB2::TreeConnectResponse)
     {
     if ( /\\sysvol$/ in c$smb_state$current_tree$path
@@ -62,7 +68,7 @@ event smb2_tree_connect_response(c: connection, hdr: SMB2::Header, response: SMB
         }
     }
 
-
+# implement sysvol detection for smb1 systems *just in case*
 event smb1_tree_connect_andx_response(c: connection, hdr: SMB1::Header, service: string, native_file_system: string)
     {
     if ( /\\sysvol$/ in c$smb_state$current_tree$path
