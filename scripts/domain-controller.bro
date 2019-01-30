@@ -16,6 +16,31 @@ export {
     global seen_domain_controllers: set[addr] &create_expire=60min;
 }
 
+event dce_rpc_response(c: connection, fid: count, ctx_id: count, 
+    opnum: count, stub_len: count)
+    {
+    if ( c?$dce_rpc )
+        {
+        if ( c$dce_rpc$endpoint == "drsuapi" 
+            && c$id$resp_h !in seen_domain_controllers 
+            && addr_matches_host(c$id$resp_h, host_tracking) )
+            {
+            local documented = F;
+
+            if ( c$id$resp_h in DOMAIN_CONTROLLERS )
+                documented = T;
+            
+            Environment::add_to_environment(HostsInfo($ts = c$start_time,
+                                            $uid = c$uid,
+                                            $host = c$id$resp_h,
+                                            $host_type = DOMAIN_CONTROLLER,
+                                            $documented = documented));
+
+            add seen_domain_controllers[c$id$resp_h];
+            }
+        }
+    }
+
 event smb2_tree_connect_response(c: connection, hdr: SMB2::Header, response: SMB2::TreeConnectResponse)
     {
     if ( /\\sysvol$/ in c$smb_state$current_tree$path
