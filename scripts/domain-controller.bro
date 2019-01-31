@@ -22,7 +22,7 @@ export {
 event dce_rpc_response(c: connection, fid: count, ctx_id: count, 
     opnum: count, stub_len: count)
     {
-    if ( c?$dce_rpc )
+    if ( c?$dce_rpc && c$dce_rpc?$endpoint && c$dce_rpc?$operation )
         {
         if ( c$dce_rpc$endpoint == "drsuapi" 
             && c$id$resp_h !in seen_domain_controllers 
@@ -49,6 +49,9 @@ event dce_rpc_response(c: connection, fid: count, ctx_id: count,
 # detecting domain controllers in domains with only a single domain controller
 event smb2_tree_connect_response(c: connection, hdr: SMB2::Header, response: SMB2::TreeConnectResponse)
     {
+    if ( ! c?$smb_state && c$smb_state?$current_tree && c$smb_state$current_tree?$path )
+        return;
+
     if ( /\\sysvol$/ in c$smb_state$current_tree$path
         && c$id$resp_h !in seen_domain_controllers
         && addr_matches_host(c$id$resp_h, host_tracking))
@@ -71,6 +74,9 @@ event smb2_tree_connect_response(c: connection, hdr: SMB2::Header, response: SMB
 # implement sysvol detection for smb1 systems *just in case*
 event smb1_tree_connect_andx_response(c: connection, hdr: SMB1::Header, service: string, native_file_system: string)
     {
+    if ( ! c?$smb_state && c$smb_state?$current_tree && c$smb_state$current_tree?$path )
+        return;
+    
     if ( /\\sysvol$/ in c$smb_state$current_tree$path
         && c$id$resp_h !in seen_domain_controllers
         && addr_matches_host(c$id$resp_h, host_tracking))
